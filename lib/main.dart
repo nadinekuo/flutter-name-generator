@@ -10,19 +10,60 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final wordPair = WordPair.random(); 
     return MaterialApp(
-      title: 'Welcome to Flutter',
+      title: 'Startup Name Generator',
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Welcome to Flutter'),
+          title: const Text('Startup Name Generator'),
         ),
-        body: Center(
-          child: Text(wordPair.asPascalCase),
+        body: const Center(
+          child: RandomWords(),
         ),
       ),
     );
   }
+}
+
+
+class RandomWords extends StatefulWidget {
+  const RandomWords({super.key});
+
+  @override
+  State<RandomWords> createState() => _RandomWordsState();
+}
+
+// Underscore (_) is used to indicate that the class is private --> good practice for widget classes
+// By extending you're using a generic State class specialized for use with RandomWords
+// This class saves the list of generated word pairs, which grows infinitely as the user scrolls
+class _RandomWordsState extends State<RandomWords> {
+
+  final _suggestions = <WordPair>[];
+  final _biggerFont = const TextStyle(fontSize: 18.0); 
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      // The itemBuilder callback is called once per suggested word pairing, and places each suggestion into a ListTile row. 
+      itemBuilder: (context, i) {
+        // For even rows, the function adds a ListTile row for the word pairing. 
+        // For odd rows, the function adds a Divider widget to visually separate the entries. 
+        if (i.isOdd) return const Divider();
+        // Integer division by 2 returns an integer result
+        final index = i ~/ 2;
+        if (index >= _suggestions.length) {
+          _suggestions.addAll(generateWordPairs().take(10));
+        }
+        return ListTile(
+          title: Text(
+            _suggestions[index].asPascalCase,
+            style: _biggerFont,
+          ),
+        );
+      },
+    );
+  }
+
 }
 
 // import 'package:flutter/material.dart';
